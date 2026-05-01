@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  * {
+    @apply border-gray-800;
+  }
+
+  html {
+    @apply bg-surface text-gray-100;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-surface min-h-screen;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-surface-1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-3 rounded-full;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface-1 rounded-xl border border-gray-800 p-5;
+  }
+
+  .card-sm {
+    @apply bg-surface-1 rounded-lg border border-gray-800 p-4;
+  }
+
+  .stat-card {
+    @apply bg-surface-2 rounded-xl border border-gray-700 p-5 flex flex-col gap-1;
+  }
+
+  .btn-primary {
+    @apply bg-brand hover:bg-brand-dark text-white font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-2 hover:bg-surface-3 text-gray-200 font-medium px-4 py-2 rounded-lg border border-gray-700 transition-colors;
+  }
+
+  .btn-ghost {
+    @apply hover:bg-surface-2 text-gray-400 hover:text-gray-200 font-medium px-3 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-danger {
+    @apply bg-red-900/60 hover:bg-red-900 text-red-300 font-medium px-4 py-2 rounded-lg border border-red-800 transition-colors;
+  }
+
+  .input {
+    @apply bg-surface-2 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-colors w-full;
+  }
+
+  .select {
+    @apply bg-surface-2 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-colors w-full cursor-pointer;
+  }
+
+  .label {
+    @apply text-sm font-medium text-gray-400 mb-1 block;
+  }
+
+  .tab {
+    @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer;
+  }
+
+  .tab-active {
+    @apply bg-brand text-white;
+  }
+
+  .tab-inactive {
+    @apply text-gray-400 hover:text-gray-200 hover:bg-surface-2;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+  }
+
+  .table-header {
+    @apply text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-3;
+  }
+
+  .table-cell {
+    @apply px-4 py-3 text-sm text-gray-200;
+  }
+
+  .table-row {
+    @apply border-b border-gray-800 hover:bg-surface-2 transition-colors;
+  }
+
+  .section-title {
+    @apply text-lg font-semibold text-gray-100;
+  }
+
+  .sub-title {
+    @apply text-sm text-gray-400;
+  }
+
+  .divider {
+    @apply border-t border-gray-800 my-4;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-light to-accent-purple bg-clip-text text-transparent;
+  }
+
+  .glow-brand {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+  }
+}
