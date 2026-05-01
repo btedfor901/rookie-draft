@@ -81,10 +81,6 @@ function buildMockPicks(): DraftBoardPick[] {
   picks[4].currentTeamId = "t12";  picks[4].isTraded = true;   // 1.05 MBR → SFR
   picks[17].currentTeamId = "t04"; picks[17].isTraded = true;  // 2.06 RSH → CSK
 
-  // Demo: first 3 fantasy picks already made
-  picks[0].draftedPlayerId = "r001"; picks[0].draftedAt = "2026-04-26T18:00:00Z"; // Fernando Mendoza → THK
-  picks[1].draftedPlayerId = "r003"; picks[1].draftedAt = "2026-04-26T18:05:00Z"; // Jeremiyah Love → DWV
-  picks[2].draftedPlayerId = "r004"; picks[2].draftedAt = "2026-04-26T18:10:00Z"; // Carnell Tate → IRT
   return picks;
 }
 
@@ -114,10 +110,10 @@ function drafted(
 export const MOCK_ROOKIES: DraftBoardRookie[] = [
 
   // ── Round 1 ────────────────────────────────────────────────────────────────
-  drafted("r001", "Fernando Mendoza",    "QB",  "LV",  "Indiana",                 1,   1,  "t01", "QB1", "First overall pick to Vegas. Elite NFL prospect with outstanding college production at Indiana. Year-one starter with immediate QB1 fantasy upside in a pass-first offense."),
+  avail  ("r001", "Fernando Mendoza",    "QB",  "LV",  "Indiana",                 1,   1,  "QB1", "First overall pick to Vegas. Elite NFL prospect with outstanding college production at Indiana. Year-one starter with immediate QB1 fantasy upside in a pass-first offense."),
   avail  ("r002", "David Bailey",        "LB",  "NYJ", "Texas Tech",              1,   2),
-  drafted("r003", "Jeremiyah Love",      "RB",  "ARI", "Notre Dame",              1,   3,  "t02", "RB1", "Third overall pick — elite athlete with great pass-catching ability. Arizona features him as a workhorse from day one. Dynasty RB1 with immediate upside."),
-  drafted("r004", "Carnell Tate",        "WR",  "TEN", "Ohio State",              1,   4,  "t03", "WR1", "Fourth overall — Ohio State's top WR in years. Polished route runner who lands as Tennessee's clear WR1 target. Dynasty WR1 talent with immediate floor."),
+  avail  ("r003", "Jeremiyah Love",      "RB",  "ARI", "Notre Dame",              1,   3,  "RB1", "Third overall pick — elite athlete with great pass-catching ability. Arizona features him as a workhorse from day one. Dynasty RB1 with immediate upside."),
+  avail  ("r004", "Carnell Tate",        "WR",  "TEN", "Ohio State",              1,   4,  "WR1", "Fourth overall — Ohio State's top WR in years. Polished route runner who lands as Tennessee's clear WR1 target. Dynasty WR1 talent with immediate floor."),
   avail  ("r005", "Arvell Reese",        "LB",  "NYG", "Ohio State",              1,   5),
   avail  ("r006", "Mansoor Delane",      "CB",  "KC",  "LSU",                     1,   6),
   avail  ("r007", "Sonny Styles",        "LB",  "WSH", "Ohio State",              1,   7),
