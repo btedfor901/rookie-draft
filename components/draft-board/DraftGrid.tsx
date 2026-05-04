@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import { getPositionBadgeClass, cn } from "@/lib/utils";
 import type { DraftBoardPick, DraftBoardRookie, DraftBoardTeam } from "@/lib/mock-data";
+import type { CollegeStatLine } from "@/lib/college-stats";
+import { formatStatLine } from "@/lib/college-stats";
 
 interface Props {
   picks: DraftBoardPick[];
@@ -11,7 +13,9 @@ interface Props {
   sessionActive: boolean;
   sessionPaused: boolean;
   isCommissioner: boolean;
+  collegeStats?: Record<string, CollegeStatLine>;
   onDraftPlayer: (rookie: DraftBoardRookie) => void;
+  onPlayerClick: (rookie: DraftBoardRookie) => void;
   onStartDraft: () => void;
   onPauseDraft: () => void;
   onUndoPick: () => void;
@@ -26,7 +30,9 @@ export default function DraftGrid({
   sessionActive,
   sessionPaused,
   isCommissioner,
+  collegeStats = {},
   onDraftPlayer,
+  onPlayerClick,
   onStartDraft,
   onPauseDraft,
   onUndoPick,
@@ -208,6 +214,7 @@ export default function DraftGrid({
                 <th className="table-header text-center">NFL Team</th>
                 <th className="table-header text-left">College</th>
                 <th className="table-header text-center">NFL Draft</th>
+                <th className="table-header text-left">2025 College Stats</th>
                 <th className="table-header text-left">Fantasy Status</th>
                 {isCommissioner && (
                   <th className="table-header text-center w-24">Action</th>
@@ -217,7 +224,7 @@ export default function DraftGrid({
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={isCommissioner ? 8 : 7} className="text-center py-16 text-gray-500 text-sm">
+                  <td colSpan={isCommissioner ? 9 : 8} className="text-center py-16 text-gray-500 text-sm">
                     No players match your filters.
                   </td>
                 </tr>
@@ -229,11 +236,10 @@ export default function DraftGrid({
                   return (
                     <tr
                       key={r.id}
+                      onClick={() => onPlayerClick(r)}
                       className={cn(
-                        "border-b border-gray-800/60 transition-colors",
-                        isDrafted
-                          ? "opacity-50"
-                          : "hover:bg-surface-2"
+                        "border-b border-gray-800/60 transition-colors cursor-pointer",
+                        isDrafted ? "opacity-50 hover:bg-surface-2/50" : "hover:bg-surface-2"
                       )}
                     >
                       {/* Rank */}
@@ -286,6 +292,27 @@ export default function DraftGrid({
                         )}
                       </td>
 
+                      {/* 2025 College Stats */}
+                      <td className="px-3 py-3">
+                        {(() => {
+                          const s = collegeStats[r.id];
+                          if (!s) return <span className="text-xs text-gray-700">—</span>;
+                          const line = formatStatLine(r.position, s);
+                          if (!line) return <span className="text-xs text-gray-700">—</span>;
+                          // For QBs also show rushing if notable
+                          const rushLine =
+                            r.position === "QB" && (s.rushYds ?? 0) > 100
+                              ? `${(s.rushYds ?? 0).toLocaleString()} rush YDS`
+                              : null;
+                          return (
+                            <div className="text-xs text-gray-300 space-y-0.5">
+                              <div>{line}</div>
+                              {rushLine && <div className="text-gray-500">{rushLine}</div>}
+                            </div>
+                          );
+                        })()}
+                      </td>
+
                       {/* Fantasy status */}
                       <td className="px-3 py-3">
                         {isDrafted && fantasyTeam ? (
@@ -305,7 +332,7 @@ export default function DraftGrid({
                         <td className="px-3 py-3 text-center">
                           {!isDrafted && canDraft && (
                             <button
-                              onClick={() => onDraftPlayer(r)}
+                              onClick={(e) => { e.stopPropagation(); onDraftPlayer(r); }}
                               className="text-xs px-3 py-1.5 bg-brand hover:bg-brand-dark text-white rounded-md font-medium transition-colors"
                             >
                               Draft

@@ -5,9 +5,11 @@ import { createClient } from "@/lib/supabase/client";
 import { cn, getPositionBadgeClass } from "@/lib/utils";
 import DraftGrid from "./DraftGrid";
 import PickModal from "./PickModal";
+import PlayerStatsModal from "./PlayerStatsModal";
 import TeamsView from "./TeamsView";
 import TradesHistory from "./TradesHistory";
 import type { DraftBoardTeam, DraftBoardPick, DraftBoardRookie } from "@/lib/mock-data";
+import type { CollegeStatLine } from "@/lib/college-stats";
 
 type Tab = "board" | "pool" | "teams" | "trades";
 
@@ -18,6 +20,7 @@ interface Props {
   isCommissioner: boolean;
   userId: string;
   isMockMode: boolean;
+  collegeStats?: Record<string, CollegeStatLine>;
 }
 
 const POSITIONS = ["All", "QB", "RB", "WR", "TE"];
@@ -25,7 +28,7 @@ const STATUS_OPTS = ["All", "Available", "Drafted"];
 
 // ── Pool sub-component (inline, works with DraftBoardRookie[]) ────────────────
 
-function RookiePool({ rookies }: { rookies: DraftBoardRookie[] }) {
+function RookiePool({ rookies, onPlayerClick }: { rookies: DraftBoardRookie[]; onPlayerClick: (r: DraftBoardRookie) => void }) {
   const [search, setSearch] = useState("");
   const [pos, setPos] = useState("All");
   const [status, setStatus] = useState("All");
@@ -132,7 +135,7 @@ function RookiePool({ rookies }: { rookies: DraftBoardRookie[] }) {
                 </tr>
               ) : (
                 filtered.map((r, i) => (
-                  <tr key={r.id} className="table-row">
+                  <tr key={r.id} onClick={() => onPlayerClick(r)} className="table-row cursor-pointer">
                     <td className="table-cell text-gray-600 text-xs font-mono">{i + 1}</td>
                     <td className="table-cell">
                       <div className="font-medium text-gray-100">{r.fullName}</div>
@@ -199,6 +202,7 @@ export default function DraftBoardHub({
   isCommissioner,
   userId,
   isMockMode,
+  collegeStats = {},
 }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>("board");
   const [picks, setPicks] = useState<DraftBoardPick[]>(initialPicks);
@@ -206,9 +210,23 @@ export default function DraftBoardHub({
   const [sessionActive, setSessionActive] = useState(false);
   const [sessionPaused, setSessionPaused] = useState(false);
   const [selectedPick, setSelectedPick] = useState<DraftBoardPick | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<DraftBoardRookie | null>(null);
   const [undoConfirm, setUndoConfirm] = useState(false);
 
   // Derived
+  const teamMap = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
+
+  const draftedByMap = useMemo(() => {
+    const map = new Map<string, DraftBoardTeam>();
+    for (const pick of picks) {
+      if (pick.draftedPlayerId) {
+        const team = teamMap.get(pick.currentTeamId);
+        if (team) map.set(pick.draftedPlayerId, team);
+      }
+    }
+    return map;
+  }, [picks, teamMap]);
+
   const onClockPick =
     sessionActive && !sessionPaused
       ? picks.find((p) => !p.draftedPlayerId) ?? null
@@ -366,14 +384,16 @@ export default function DraftBoardHub({
           sessionActive={sessionActive}
           sessionPaused={sessionPaused}
           isCommissioner={isCommissioner}
+          collegeStats={collegeStats}
           onDraftPlayer={handleDraftPlayer}
+          onPlayerClick={setSelectedPlayer}
           onStartDraft={() => { setSessionActive(true); setSessionPaused(false); }}
           onPauseDraft={() => setSessionPaused((p) => !p)}
           onUndoPick={() => setUndoConfirm(true)}
         />
       )}
 
-      {activeTab === "pool" && <RookiePool rookies={rookies} />}
+      {activeTab === "pool" && <RookiePool rookies={rookies} onPlayerClick={setSelectedPlayer} />}
 
       {activeTab === "teams" && (
         <TeamsView teams={teams} picks={picks} rookies={rookies} />
@@ -381,6 +401,16 @@ export default function DraftBoardHub({
 
       {activeTab === "trades" && (
         <TradesHistory picks={picks} rookies={rookies} teams={teams} />
+      )}
+
+      {/* ── Player stats modal ── */}
+      {selectedPlayer && (
+        <PlayerStatsModal
+          rookie={selectedPlayer}
+          fantasyTeam={draftedByMap.get(selectedPlayer.id) ?? null}
+          collegeStats={collegeStats[selectedPlayer.id]}
+          onClose={() => setSelectedPlayer(null)}
+        />
       )}
 
       {/* ── Pick modal ── */}

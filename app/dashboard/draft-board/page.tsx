@@ -9,6 +9,7 @@ import {
   type DraftBoardPick,
   type DraftBoardRookie,
 } from "@/lib/mock-data";
+import { fetchCollegeStats, type CollegeStatLine } from "@/lib/college-stats";
 
 export const metadata = { title: "Draft Board | Rookie Draft" };
 
@@ -36,6 +37,13 @@ export default async function DraftBoardPage() {
   const isMockMode = !dbTeams || dbTeams.length === 0 || !pickCount || pickCount === 0;
 
   if (isMockMode) {
+    const statsMap = await fetchCollegeStats(2025);
+    const collegeStats: Record<string, CollegeStatLine> = {};
+    for (const r of MOCK_ROOKIES) {
+      const { lookupStats } = await import("@/lib/college-stats");
+      const s = lookupStats(r.fullName, statsMap);
+      if (s) collegeStats[r.id] = s;
+    }
     return (
       <div className="space-y-4">
         <div>
@@ -52,6 +60,7 @@ export default async function DraftBoardPage() {
           isCommissioner={isCommissioner}
           userId={authUser.id}
           isMockMode={true}
+          collegeStats={collegeStats}
         />
       </div>
     );
@@ -134,6 +143,14 @@ export default async function DraftBoardPage() {
     fantasyOutlook: r.fantasy_outlook,
   }));
 
+  const { lookupStats } = await import("@/lib/college-stats");
+  const statsMap = await fetchCollegeStats(2025);
+  const collegeStats: Record<string, CollegeStatLine> = {};
+  for (const r of rookies) {
+    const s = lookupStats(r.fullName, statsMap);
+    if (s) collegeStats[r.id] = s;
+  }
+
   return (
     <div className="space-y-4">
       <div>
@@ -150,6 +167,7 @@ export default async function DraftBoardPage() {
         isCommissioner={isCommissioner}
         userId={authUser.id}
         isMockMode={false}
+        collegeStats={collegeStats}
       />
     </div>
   );
