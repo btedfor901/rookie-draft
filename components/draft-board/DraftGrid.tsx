@@ -21,7 +21,8 @@ interface Props {
   onUndoPick: () => void;
 }
 
-const POSITIONS = ["All", "QB", "RB", "WR", "TE", "K", "OL", "DL", "LB", "DB"];
+const POSITIONS = ["All", "QB", "RB", "WR", "TE"];
+const OFFENSIVE_POSITIONS = ["QB", "RB", "WR", "TE"];
 
 export default function DraftGrid({
   picks,
@@ -67,7 +68,7 @@ export default function DraftGrid({
   }, [picks, teamMap]);
 
   const filtered = useMemo(() => {
-    let list = [...rookies];
+    let list = rookies.filter((r) => OFFENSIVE_POSITIONS.includes(r.position));
     if (!showDrafted) list = list.filter((r) => r.draftStatus === "available");
     if (pos !== "All") list = list.filter((r) => r.position === pos);
     if (search.trim()) {

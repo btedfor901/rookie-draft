@@ -24,6 +24,7 @@ interface Props {
 }
 
 const POSITIONS = ["All", "QB", "RB", "WR", "TE"];
+const OFFENSIVE_POSITIONS = ["QB", "RB", "WR", "TE"];
 const STATUS_OPTS = ["All", "Available", "Drafted"];
 
 // ── Pool sub-component (inline, works with DraftBoardRookie[]) ────────────────
@@ -34,7 +35,7 @@ function RookiePool({ rookies, onPlayerClick }: { rookies: DraftBoardRookie[]; o
   const [status, setStatus] = useState("All");
 
   const filtered = useMemo(() => {
-    let list = [...rookies];
+    let list = rookies.filter((r) => OFFENSIVE_POSITIONS.includes(r.position));
     if (pos !== "All") list = list.filter((r) => r.position === pos);
     if (status === "Available") list = list.filter((r) => r.draftStatus === "available");
     if (status === "Drafted") list = list.filter((r) => r.draftStatus === "drafted");
@@ -57,12 +58,13 @@ function RookiePool({ rookies, onPlayerClick }: { rookies: DraftBoardRookie[]; o
     return list;
   }, [rookies, search, pos, status]);
 
-  const available = rookies.filter((r) => r.draftStatus === "available").length;
+  const offensiveRookies = rookies.filter((r) => OFFENSIVE_POSITIONS.includes(r.position));
+  const available = offensiveRookies.filter((r) => r.draftStatus === "available").length;
 
   return (
     <div className="space-y-4">
       <div className="flex gap-4 text-sm text-gray-400">
-        <span><strong className="text-gray-100">{rookies.length}</strong> total</span>
+        <span><strong className="text-gray-100">{offensiveRookies.length}</strong> total</span>
         <span>·</span>
         <span><strong className="text-accent-green">{available}</strong> available</span>
         {filtered.length !== rookies.length && (
@@ -335,7 +337,7 @@ export default function DraftBoardHub({
 
   const tabs: { id: Tab; label: string; badge?: string }[] = [
     { id: "board", label: "Draft Board", badge: `${pickedCount}/${totalPicks}` },
-    { id: "pool",  label: "Rookie Pool", badge: String(rookies.filter((r) => r.draftStatus === "available").length) },
+    { id: "pool",  label: "Rookie Pool", badge: String(rookies.filter((r) => OFFENSIVE_POSITIONS.includes(r.position) && r.draftStatus === "available").length) },
     { id: "teams", label: "Teams", badge: String(teams.length) },
     { id: "trades", label: "Trades & History" },
   ];
