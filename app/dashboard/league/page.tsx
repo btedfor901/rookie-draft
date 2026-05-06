@@ -136,7 +136,8 @@ export default async function LeagueRostersPage() {
       const ownerName = user?.display_name ?? "Unknown";
 
       const faabUsed = roster.settings.waiver_budget_used ?? 0;
-      const faabRemaining = totalFAAB - faabUsed;
+      const sleeperRemaining = totalFAAB - faabUsed;
+      const faabRemaining = Math.min(sleeperRemaining + 300, totalFAAB);
 
       const allIds = roster.players ?? [];
       const starterSet = new Set((roster.starters ?? []).filter((id) => id !== "0"));
